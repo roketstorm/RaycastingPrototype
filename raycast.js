@@ -5,6 +5,11 @@ const MAP_NUM_COLS = 15;
 const WINDOW_WIDTH = MAP_NUM_COLS * TILE_SIZE;
 const WINDOW_HEIGHT = MAP_NUM_ROWS * TILE_SIZE;
 
+const FOV_ANGLE = 60 * (Math.PI / 180);
+
+const WALL_STRIP_WIDTH = 10;
+const NUM_RAYS = WINDOW_WIDTH / WALL_STRIP_WIDTH;
+
 class Map {
     constructor() {
         this.grid = [
@@ -28,7 +33,7 @@ class Map {
         }
         let mapGridIndexX = Math.floor(x / TILE_SIZE);
         let mapGridIndexY = Math.floor(y / TILE_SIZE);
-        return this.grid[mapGridIndexY][mapGridIndexX] != 0; 
+        return this.grid[mapGridIndexY][mapGridIndexX] != 0;
     }
 
     render() {
@@ -65,7 +70,7 @@ class Player {
         let newPlayerY = this.y + Math.sin(this.rotationAngle) * moveStep;
 
         // Only set new player position if it is not colliding with map walls
-        if(!grid.hasWallAt(newPlayerX, newPlayerY)) {
+        if (!grid.hasWallAt(newPlayerX, newPlayerY)) {
             this.x = newPlayerX;
             this.y = newPlayerY;
         }
@@ -77,6 +82,17 @@ class Player {
         circle(this.x, this.y, this.radius);
         stroke("red");
         line(this.x, this.y, this.x + Math.cos(this.rotationAngle) * 30, this.y + Math.sin(this.rotationAngle) * 30);
+    }
+}
+
+class Ray {
+    constructor(rayAngle) {
+        this.rayAngle = rayAngle;
+    }
+
+    render() {
+        stroke("rgba(255, 0, 0, 0.3)");
+        line(player.x, player.y, player.x + Math.cos(this.rayAngle) * 30, player.y + Math.sin(this.rayAngle) * 30);
     }
 }
 
@@ -107,16 +123,37 @@ function keyReleased() {
     }
 }
 
+function castAllRays() {
+    let columnId = 0;
+
+    let rayAngle = player.rotationAngle - (FOV_ANGLE / 2);
+
+    rays = [];
+
+    for (let i = 0; i < NUM_RAYS; i++) {
+        let ray = new Ray(rayAngle);
+        rays.push(ray);
+
+        rayAngle += FOV_ANGLE / NUM_RAYS;
+
+        columnId++;
+    }
+}
+
 function setup() {
     createCanvas(WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 function update() {
     player.update();
+    castAllRays();
 }
 
 function draw() {
     update();
     grid.render();
+    for (ray of rays) {
+        ray.render();
+    }
     player.render();
 }
