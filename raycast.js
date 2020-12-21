@@ -152,20 +152,20 @@ class Ray {
         xintersect += this.isRayFacingRight ? TILE_SIZE : 0;
 
         // Find the x-coordinate of the closest vertical grid intersection
-        yintersect = player.y + (xintersect - player.x) / Math.tan(this.rayAngle);
+        yintersect = player.y + (xintersect - player.x) * Math.tan(this.rayAngle);
 
         // Calculate the increment xstep and ystep
         xstep = TILE_SIZE;
         xstep *= this.isRayFacingLeft ? -1 : 1;
 
-        ystep = TILE_SIZE / Math.tan(this.rayAngle);
+        ystep = TILE_SIZE * Math.tan(this.rayAngle);
         ystep *= (this.isRayFacingUp && ystep > 0) ? -1 : 1;
         ystep *= (this.isRayFacingDown && ystep < 0) ? -1 : 1;
 
         let nextVertTouchX = xintersect;
         let nextVertTouchY = yintersect;
 
-        if (this.isRayFacingUpLeft) nextVertTouchX--;
+        if (this.isRayFacingLeft) nextVertTouchX--;
 
         // Increment xstep and ystep until we find a wall
         while (nextVertTouchX >= 0 && nextVertTouchX <= WINDOW_WIDTH && nextVertTouchY >= 0 && nextVertTouchY <= WINDOW_HEIGHT) {
