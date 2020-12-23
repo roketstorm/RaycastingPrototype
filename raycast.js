@@ -102,7 +102,7 @@ class Ray {
         this.isRayFacingLeft = !this.isRayFacingRight;
     }
 
-    cast(columnId) {
+    cast() {
         let xstep, ystep;
         let xintersect, yintersect;
 
@@ -188,11 +188,17 @@ class Ray {
             : Number.MAX_VALUE;
 
         // Only store the smallest distance
-        this.wallHitX = (horzHitDistance < vertHitDistance) ? horzWallHitX : vertWallHitX;
-        this.wallHitY = (horzHitDistance < vertHitDistance) ? horzWallHitY : vertWallHitY;
-        this.distance = (horzHitDistance < vertHitDistance) ? horzHitDistance : vertHitDistance;
-
-        this.wasHitVertical = (vertHitDistance < horzHitDistance);
+        if (vertHitDistance < horzHitDistance) {
+            this.wallHitX = vertWallHitX;
+            this.wallHitY = vertWallHitY;
+            this.distance = vertHitDistance;
+            this.wasHitVertical = true;
+        } else {
+            this.wallHitX = horzWallHitX;
+            this.wallHitY = horzWallHitY;
+            this.distance = horzHitDistance;
+            this.wasHitVertical = false;
+        }
     }
 
     render() {
@@ -230,20 +236,16 @@ function keyReleased() {
 }
 
 function castAllRays() {
-    let columnId = 0;
-
     let rayAngle = player.rotationAngle - (FOV_ANGLE / 2);
 
     rays = [];
 
     for (let i = 0; i < NUM_RAYS; i++) {
         let ray = new Ray(rayAngle);
-        ray.cast(columnId);
+        ray.cast();
         rays.push(ray);
 
         rayAngle += FOV_ANGLE / NUM_RAYS;
-
-        columnId++;
     }
 }
 
@@ -269,7 +271,7 @@ function render3DProjectedWalls() {
 
         // Projected wall height
         let wallStripHeight = (TILE_SIZE / correctWallDistance) * distanceProjectionPlane;
-        
+
         // Compute transparency based on the wall distance
         let alpha = 100 / correctWallDistance;
 
