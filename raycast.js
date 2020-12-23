@@ -273,10 +273,12 @@ function render3DProjectedWalls() {
         let wallStripHeight = (TILE_SIZE / correctWallDistance) * distanceProjectionPlane;
 
         // Compute transparency based on the wall distance
-        let alpha = 100 / correctWallDistance;
+        let alpha = 1.0; //100 / correctWallDistance;
+
+        let color = ray.wasHitVertical ? 255 : 200;
 
         // Render a rectangle
-        fill("rgba(255, 255, 255," + alpha + ")");
+        fill("rgba(" + color + "," + color + "," + color + "," + alpha + ")");
         noStroke();
         rect(i * WALL_STRIP_WIDTH, (WINDOW_HEIGHT / 2) - (wallStripHeight / 2), WALL_STRIP_WIDTH, wallStripHeight);
     }
